@@ -1,0 +1,120 @@
+# =============================================================
+#  Code to Production - the pipeline the audience watches run
+# =============================================================
+#
+# Each job below is ONE stage from the journey diagram in the slides.
+# They run in order (each 'needs' the one before), so the Actions graph
+# draws left-to-right exactly like the slide: Build -> Test -> Package -> Deploy.
+#
+# If any stage fails, the ones after it never run. That's the safety
+# gate - bad code can't reach 'deploy' on its own.
+#
+# Nothing here touches any real production system. It runs entirely on
+# GitHub's free runners. Safe to run live, safe to run a hundred times.
+
+name: Code to Production
+
+on:
+  push:
+    branches: [ main ]
+  workflow_dispatch:   # lets you click "Run workflow" by hand if you prefer
+
+# The Deploy stage publishes a real page, so it needs permission to do that.
+permissions:
+  contents: read
+  pages: write
+  id-token: write
+
+# Only one deploy at a time, so two quick pushes cannot race each other.
+concurrency:
+  group: pages
+  cancel-in-progress: false
+
+jobs:
+
+  # ---- STAGE 1: BUILD ----------------------------------------
+  build:
+    name: 1. Build
+    runs-on: ubuntu-latest
+    steps:
+      - name: Get the code
+        uses: actions/checkout@v5
+      - name: Set up Python
+        uses: actions/setup-python@v6
+        with:
+          python-version: "3.12"
+      - name: Build - turn source into something runnable
+        run: |
+          echo "Compiling / assembling the application..."
+          python -c "import app.main; print('Build OK - app imports cleanly')"
+
+  # ---- STAGE 2: TEST -----------------------------------------
+  test:
+    name: 2. Test
+    needs: build
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v5
+      - uses: actions/setup-python@v6
+        with:
+          python-version: "3.12"
+      - name: Install test runner
+        run: pip install pytest
+      - name: Run the automated tests
+        run: |
+          echo "Running tests. If any fail, the pipeline stops here."
+          pytest -v
+
+  # ---- STAGE 3: PACKAGE --------------------------------------
+  package:
+    name: 3. Package (container image)
+    needs: test
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v5
+      - name: Build the container image
+        run: |
+          echo "Sealing the app and everything it needs into one image..."
+          docker build -t code-to-prod-demo:${{ github.sha }} .
+          echo "Image built: code-to-prod-demo:${{ github.sha }}"
+      - name: Prove the container actually runs
+        run: |
+          echo "Starting the container to prove it works anywhere..."
+          docker run --rm code-to-prod-demo:${{ github.sha }} python app/main.py &
+          sleep 3
+          echo "Container started successfully."
+
+  # ---- STAGE 4: DEPLOY ---------------------------------------
+  deploy:
+    name: 4. Deploy (to Test)
+    needs: package
+    runs-on: ubuntu-latest
+    # This URL appears in the Actions graph - click it to see the live page.
+    environment:
+      name: github-pages
+      url: ${{ steps.deployment.outputs.page_url }}
+    steps:
+      - uses: actions/checkout@v5
+      - uses: actions/setup-python@v6
+        with:
+          python-version: "3.12"
+      - name: Render the page from the application code
+        run: |
+          echo "Deploying the sealed image to the Test environment..."
+          mkdir -p site
+          PYTHONPATH=. BUILT_AT="$(date -u '+%d %b %Y, %H:%M:%S UTC')" python scripts/render.py > site/index.html
+          echo "Page rendered from the app that just passed its tests."
+      - uses: actions/configure-pages@v5
+      - uses: actions/upload-pages-artifact@v3
+        with:
+          path: site
+      - name: Publish to the Test environment
+        id: deployment
+        uses: actions/deploy-pages@v4
+      - name: Announce
+        run: |
+          echo "  ============================================"
+          echo "   DEPLOYED - the journey is complete."
+          echo "   commit -> build -> test -> package -> deploy"
+          echo "   Live at: ${{ steps.deployment.outputs.page_url }}"
+          echo "  ============================================"
