@@ -16,7 +16,7 @@ def greeting(name: str = "world") -> str:
 def version() -> str:
     # Change this string live during the session, commit, and watch the
     # whole pipeline run. This is your "tiny safe change".
-    return "1.0.0"
+    return "1.0.1"
 
 
 # Minimal WSGI app so there's something a container can actually run.
