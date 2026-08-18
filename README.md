@@ -35,8 +35,13 @@ That's it. You now have a working pipeline you fully control.
 
 ## Running it live during the session (your 3-minute demo)
 
-**Before you start:** have the repo open on the **Actions** tab, and have
-`app/main.py` open in an editor in another tab.
+**The live page:** https://zaidsiddiqui-hukm.github.io/code-to-prod-demo/
+This is the real, public result of the pipeline. It is rebuilt from `app/main.py`
+on every push, so the version on screen changes when you change the code.
+
+**Before you start:** open three tabs — the **Actions** tab, the **live page**
+above, and `app/main.py` in an editor. Show the live page first, on `1.0.0`,
+so the audience sees the "before".
 
 1. Say: *"I'm going to make a tiny change and we'll watch the journey we just
    drew — live."*
@@ -54,7 +59,10 @@ That's it. You now have a working pipeline you fully control.
    - *"Now tests are running… green. If they'd failed, it would stop right here."*
    - *"Now it's packaging into a container."*
    - *"Now deploying to Test."*
-5. Land it: *"That's the whole journey — automatic, in under a minute.
+5. **The payoff.** Switch to the live page tab and refresh it. The version has
+   changed to `1.0.1`. *"That page is built from the code I just edited. I never
+   touched a server — the pipeline did all of it."*
+6. Land it: *"That's the whole journey — automatic, in under a minute.
    Nobody touched a server. Nobody copied a file at 2am."*
 
 ---
@@ -91,6 +99,7 @@ recording and narrate over it — the audience can't tell the difference.
 | `Dockerfile` | The **Package** stage — the recipe for the sealed container |
 | `.github/workflows/pipeline.yml` | The pipeline itself — Build → Test → Package → Deploy |
 | `conftest.py` | Lets the tests import the app. Without it the Test stage cannot even start |
+| `scripts/render.py` | The **Deploy** stage — builds the live page from the app itself |
 
 ---
 
