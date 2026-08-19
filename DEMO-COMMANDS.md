@@ -15,12 +15,22 @@ Open the terminal here:
 
     cd "C:\Users\admin\Desktop\code-to-prod-demo-repo\demo-repo"
 
-Confirm you are primed and authenticated as the right account:
+**Run this first, every time.** You have two GitHub accounts on this machine
+and the active one has been observed flipping on its own. If the wrong one is
+active your push is rejected:
+
+    gh auth switch --user ZaidSiddiqui-HUKM
+
+Then confirm you are primed:
 
     git status
 
 Expect "nothing to commit, working tree clean". If it is not clean, run the
 Reset in section 3 before you go on stage.
+
+Now prove the whole path works end to end while nobody is watching. Run the
+Reset in section 3 and watch it go green. Do NOT skip this - it is the only
+way to know your credentials are good on the day.
 
 ---
 
