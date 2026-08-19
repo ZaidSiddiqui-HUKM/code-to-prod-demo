@@ -11,6 +11,18 @@ and leave it in this folder.
 
 ## 0. Pre-flight (10 minutes before you start)
 
+### Use Windows PowerShell, NOT the PyCharm terminal
+
+Your git is configured to get its GitHub token from the `gh` CLI:
+
+    credential.https://github.com.helper = gh auth git-credential
+
+That means `git push` only works where `gh` can see your login. In the
+PyCharm terminal `gh` reports "not logged in to any hosts", so pushes will
+FAIL there. Verified working: Windows PowerShell / Windows Terminal.
+
+Keep PyCharm open for editing `app/main.py` - just push from PowerShell.
+
 Open the terminal here:
 
     cd "C:\Users\admin\Desktop\code-to-prod-demo-repo\demo-repo"
