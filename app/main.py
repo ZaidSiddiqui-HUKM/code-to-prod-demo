@@ -10,7 +10,7 @@ once you push it. Watch the Actions tab.
 
 def greeting(name: str = "world") -> str:
     """Return a greeting. This is the 'feature' we ship in the demo."""
-    return f"Hello, {name}! This code travelled from a PC to a container."
+    return f"Hello, {name}! This code travelled from a laptop to a container."
 
 
 def version() -> str:
