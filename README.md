@@ -100,6 +100,7 @@ recording and narrate over it — the audience can't tell the difference.
 | `.github/workflows/pipeline.yml` | The pipeline itself — Build → Test → Package → Deploy |
 | `conftest.py` | Lets the tests import the app. Without it the Test stage cannot even start |
 | `scripts/render.py` | The **Deploy** stage — builds the live page from the app itself |
+| `DEMO-COMMANDS.md` | Your copy/paste commands for demo day |
 
 ---
 
